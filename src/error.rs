@@ -8,6 +8,8 @@ use regex;
 pub enum DCPMError {
     #[error("IOError")]
     IOError(#[from] io::Error),
+    #[error("ShellError")]
+    ShellError(String),
     #[error("DockerError")]
     DockerError(String),
     #[error("UTF8Error")]

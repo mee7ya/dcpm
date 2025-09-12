@@ -7,7 +7,10 @@ use crate::{error::DCPMError, structs::Top};
 pub fn get_docker_top(container: &String) -> Result<Vec<Top>, DCPMError> {
     let top = Command::new("docker")
         .args(["top", container, "-o", "pid,comm"])
-        .output()?;
+        .output().map_err(|e| match e.kind() {
+            io::ErrorKind::NotFound => DCPMError::ShellError(String::from("Can't access docker binary")),
+            _ => DCPMError::IOError(e)
+        })?;
     if !top.status.success() {
         return Err(DCPMError::DockerError(String::from_utf8(
             if !top.stdout.is_empty() {
@@ -15,7 +18,7 @@ pub fn get_docker_top(container: &String) -> Result<Vec<Top>, DCPMError> {
             } else {
                 top.stderr
             },
-        )?));
+        )?.trim_end().to_string()));
     }
     let top = String::from_utf8(top.stdout)?;
 
@@ -38,11 +41,11 @@ pub fn map_pid(pid: usize) -> Result<usize, DCPMError> {
             io::ErrorKind::PermissionDenied => {
                 DCPMError::FileIOError(format!("Permission denied for: {path}"))
             }
-            _ => DCPMError::FileIOError(format!("{e}"))
+            _ => DCPMError::IOError(e)
         }
     })?;
     let reader: BufReader<File> = BufReader::new(status_file);
-    let regex = Regex::new(r"(\S+)\s+(\S+)\s+(\S+)\n")?;
+    let regex = Regex::new(r"(\S+)\t(\S+)\t(\S+)")?;
     for line in reader.lines() {
         let line: String = line?;
         if line.starts_with("NSpid:") {

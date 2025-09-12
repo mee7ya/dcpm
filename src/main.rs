@@ -12,9 +12,12 @@ struct CLI {
 
 fn main() -> Result<(), DCPMError> {
     let args: CLI = CLI::parse();
-    let top = dcpm::pid::get_docker_top(&args.container)?;
+    let top = pid::get_docker_top(&args.container)?;
+    let mut output: Vec<String> = vec![format!("{:>8} {:>13} {}", "HOST_PID", "CONTAINER_PID", "COMMAND")];
     for entry in top {
-        let pid = dcpm::pid::map_pid(entry.pid)?;
+        let pid = pid::map_pid(entry.pid)?;
+        output.push(format!("{:>8} {:>13} {}", entry.pid, pid, entry.command));
     }
+    println!("{}", output.join("\n"));
     Ok(())
 }
