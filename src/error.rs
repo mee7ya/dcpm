@@ -1,4 +1,4 @@
-use std::{io, string};
+use std::{io, num::ParseIntError, string};
 
 use thiserror::Error;
 
@@ -6,8 +6,8 @@ use regex;
 
 #[derive(Error, Debug)]
 pub enum DCPMError {
-    #[error("ShellError")]
-    ShellError(#[from] io::Error),
+    #[error("IOError")]
+    IOError(#[from] io::Error),
     #[error("DockerError")]
     DockerError(String),
     #[error("UTF8Error")]
@@ -15,5 +15,11 @@ pub enum DCPMError {
     #[error("RegexError")]
     RegexError(#[from] regex::Error),
     #[error("ParseIntError")]
-    ParseIntError(String),
+    ParseIntError(#[from] ParseIntError),
+    #[error("FileIOError")]
+    FileIOError(String),
+    #[error("ReadError")]
+    ReadError,
+    #[error("MapError")]
+    MapError(String)
 }
