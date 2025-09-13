@@ -14,12 +14,13 @@ fn main() -> Result<(), DCPMError> {
     let args: CLI = CLI::parse();
     let top: Vec<(String, String)> = pid::get_docker_top(&args.container)?;
     let mut output: Vec<String> = vec![format!(
-        "{:>8} {:>13} {}",
+        "{:>8} {:<15} {}",
         "HOST_PID", "CONTAINER_PID", "COMMAND"
     )];
+
     for (host_pid, command) in top {
         let container_pid = pid::map_pid(&host_pid)?;
-        output.push(format!("{:>8} {:>13} {}", host_pid, container_pid, command));
+        output.push(format!("{:>8} {:<15} {}", host_pid, container_pid, command));
     }
     println!("{}", output.join("\n"));
     Ok(())

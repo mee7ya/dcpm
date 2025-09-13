@@ -30,7 +30,6 @@ pub fn get_docker_top(container: &String) -> Result<Vec<(String, String)>, DCPME
         ));
     }
     let top = String::from_utf8(top.stdout)?;
-    println!("{top}");
 
     let regex = Regex::new(r"(\d+)\s+(\S.+)\n")?;
     Ok(regex
