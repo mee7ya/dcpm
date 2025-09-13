@@ -2,8 +2,14 @@
 name = "dcpm"
 version = "0.1.0"
 edition = "2024"
+repository = "https://github.com/mee7ya/dcpm"
 
 [dependencies]
 clap = { version = "4.5.47", features = ["derive"] }
 regex = "1.11.2"
 thiserror = "2.0.16"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
