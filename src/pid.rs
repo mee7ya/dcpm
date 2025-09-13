@@ -31,16 +31,15 @@ pub fn get_docker_top(container: &String) -> Result<Vec<(String, String)>, DCPME
     }
     let top = String::from_utf8(top.stdout)?;
 
-    let regex = Regex::new(r"(\d+)\s+(\S.+)\n")?;
+    let regex = Regex::new(r"(\d+)\s+(\S.+)")?;
     Ok(regex
         .captures_iter(&top)
-        .skip(1)
         .map(|x| x.extract())
         .map(|(_, x): (&str, [&str; 2])| (String::from(x[0]), String::from(x[1])))
         .collect())
 }
 
-pub fn map_pid(pid: &String) -> Result<usize, DCPMError> {
+pub fn map_pid(pid: &String) -> Result<String, DCPMError> {
     let path: String = format!("/proc/{pid}/status");
     let status_file: File = File::open(&path).map_err(|e| match e.kind() {
         io::ErrorKind::NotFound => DCPMError::FileIOError(format!("Path not found: {path}")),
@@ -60,7 +59,7 @@ pub fn map_pid(pid: &String) -> Result<usize, DCPMError> {
                 )));
             };
             let (_, [_, _, container_pid]) = caps.extract();
-            return Ok(usize::from_str_radix(container_pid, 10)?);
+            return Ok(String::from(container_pid));
         }
     }
     return Err(DCPMError::MapError(format!("NSpid not found for {pid}")));

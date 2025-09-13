@@ -1,4 +1,4 @@
-use std::{io, num::ParseIntError, string};
+use std::{io, string};
 
 use thiserror::Error;
 
@@ -16,12 +16,8 @@ pub enum DCPMError {
     UTF8Error(#[from] string::FromUtf8Error),
     #[error("RegexError")]
     RegexError(#[from] regex::Error),
-    #[error("ParseIntError")]
-    ParseIntError(#[from] ParseIntError),
     #[error("FileIOError")]
     FileIOError(String),
-    #[error("ReadError")]
-    ReadError,
     #[error("MapError")]
     MapError(String),
 }
