@@ -1,5 +1,5 @@
 use clap::Parser;
-use dcpm::{pid, error::DCPMError};
+use dcpm::{error::DCPMError, pid};
 
 #[derive(Parser, Debug)]
 #[command(name = "Docker Container PID Mapper")]
@@ -12,11 +12,14 @@ struct CLI {
 
 fn main() -> Result<(), DCPMError> {
     let args: CLI = CLI::parse();
-    let top = pid::get_docker_top(&args.container)?;
-    let mut output: Vec<String> = vec![format!("{:>8} {:>13} {}", "HOST_PID", "CONTAINER_PID", "COMMAND")];
-    for entry in top {
-        let pid = pid::map_pid(entry.pid)?;
-        output.push(format!("{:>8} {:>13} {}", entry.pid, pid, entry.command));
+    let top: Vec<(String, String)> = pid::get_docker_top(&args.container)?;
+    let mut output: Vec<String> = vec![format!(
+        "{:>8} {:>13} {}",
+        "HOST_PID", "CONTAINER_PID", "COMMAND"
+    )];
+    for (host_pid, command) in top {
+        let container_pid = pid::map_pid(&host_pid)?;
+        output.push(format!("{:>8} {:>13} {}", host_pid, container_pid, command));
     }
     println!("{}", output.join("\n"));
     Ok(())

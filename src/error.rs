@@ -23,5 +23,5 @@ pub enum DCPMError {
     #[error("ReadError")]
     ReadError,
     #[error("MapError")]
-    MapError(String)
+    MapError(String),
 }
